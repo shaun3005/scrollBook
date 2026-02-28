@@ -1,0 +1,90 @@
+.bookPage {
+    position: relative;
+    height: var(--vr-container-height, 100vh);
+    width: 100%;
+    scroll-snap-align: start;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    background-color: #1e1e1e;
+}
+
+.contentContainer {
+    max-width: 85%;
+    width: 600px;
+    z-index: 1;
+    color: #eee;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.pageHeader {
+    margin-bottom: auto;
+    padding-top: 40px;
+    opacity: 0.8;
+    transition: opacity 0.3s;
+}
+
+.bookTitleSmall {
+    font-size: 1.2rem;
+    margin-bottom: 4px;
+    font-weight: 600;
+}
+
+.chapterTitleSmall {
+    font-size: 0.9rem;
+    color: #ccc;
+    font-weight: 400;
+}
+
+.sentenceContent {
+    font-size: 1.8rem;
+    line-height: 1.6;
+    font-weight: 500;
+    text-align: center;
+    margin: auto 0;
+    word-break: keep-all;
+    overflow-wrap: break-word;
+}
+
+.pageFooter {
+    margin-top: auto;
+    padding-bottom: 100px;
+    font-size: 0.9rem;
+    color: #aaa;
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .contentContainer {
+        max-width: 90%;
+    }
+
+    .sentenceContent {
+        font-size: 1.5rem;
+        line-height: 1.5;
+    }
+
+    .pageHeader {
+        padding-top: 20px;
+    }
+
+    .pageFooter {
+        padding-bottom: 80px;
+    }
+}
+
+@media (max-width: 480px) {
+    .sentenceContent {
+        font-size: 1.35rem;
+    }
+
+    .bookTitleSmall {
+        font-size: 1rem;
+    }
+}

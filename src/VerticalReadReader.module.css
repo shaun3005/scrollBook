@@ -1,0 +1,382 @@
+.container {
+    --vr-color-bg: #121212;
+    --vr-color-text: #ffffff;
+    --vr-color-text-secondary: #aaaaaa;
+    --vr-color-accent: #ff0050;
+    --vr-color-overlay: rgba(0, 0, 0, 0.5);
+    --vr-color-surface: #1e1e1e;
+
+    --vr-font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
+
+    --vr-spacing-xs: 4px;
+    --vr-spacing-sm: 8px;
+    --vr-spacing-md: 16px;
+    --vr-spacing-lg: 24px;
+
+    --vr-border-radius-sm: 8px;
+    --vr-border-radius-md: 12px;
+
+    font-family: var(--vr-font-family);
+    color: var(--vr-color-text);
+    background: linear-gradient(180deg, #2b3a4a 0%, #1e1e1e 100%);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    box-sizing: border-box;
+
+    overflow-y: auto;
+    scroll-snap-type: y mandatory;
+    scroll-behavior: smooth;
+    height: 100%;
+    position: relative;
+    scrollbar-width: none;
+}
+
+.container::-webkit-scrollbar {
+    display: none;
+}
+
+.container *,
+.container *::before,
+.container *::after {
+    box-sizing: border-box;
+}
+
+.container h1,
+.container h2,
+.container h3 {
+    font-weight: 700;
+    line-height: 1.2;
+    margin: 0;
+}
+
+.container p {
+    line-height: 1.6;
+    font-size: 1.1rem;
+    color: var(--vr-color-text);
+    margin: 0;
+}
+
+.container button {
+    font-family: inherit;
+    cursor: pointer;
+    border: none;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--vr-color-text);
+    padding: var(--vr-spacing-sm) var(--vr-spacing-md);
+    border-radius: var(--vr-border-radius-sm);
+    font-size: 0.9rem;
+    transition: background 0.2s, transform 0.1s;
+}
+
+.container button:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.container button:active {
+    transform: scale(0.98);
+}
+
+.spinner {
+    position: absolute;
+    bottom: var(--vr-spacing-lg);
+    left: 50%;
+    transform: translateX(-50%);
+    width: 32px;
+    height: 32px;
+    border: 3px solid rgba(255, 255, 255, 0.2);
+    border-top-color: var(--vr-color-accent);
+    border-radius: 50%;
+    animation: vrSpin 0.8s linear infinite;
+    z-index: 5;
+}
+
+@keyframes vrSpin {
+    to {
+        transform: translateX(-50%) rotate(360deg);
+    }
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+}
+
+.chunkGroup {
+    /* Chunk group wrapper — class needed for CSS Module hashing */
+    min-width: 0;
+}
+
+.sentenceWrapper {
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    height: var(--vr-container-height, 100vh);
+    position: relative;
+}
+
+.error {
+    padding: 20px;
+    text-align: center;
+    color: #ffaaaa;
+}
+
+.retryContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 40px 20px;
+    color: var(--vr-color-text-secondary);
+}
+
+.retryButton {
+    background: var(--vr-color-accent) !important;
+    color: white !important;
+    padding: 10px 24px !important;
+    border-radius: 20px !important;
+    font-size: 0.9rem !important;
+    cursor: pointer;
+}
+
+.drawerOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 50;
+    animation: vrFadeIn 0.3s ease-out;
+}
+
+.drawerSheet {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    max-width: 480px;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 70%;
+    background-color: #1e1e1e;
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.3);
+    animation: vrSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 51;
+}
+
+.drawerHeader {
+    padding: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.drawerTitle {
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.drawerClose {
+    background: none;
+    border: none;
+    color: #999;
+    font-size: 1.5rem;
+    padding: 0 8px;
+    cursor: pointer;
+}
+
+.drawerBody {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+}
+
+.drawerFooter {
+    padding: 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    background-color: #1e1e1e;
+}
+
+.commentItem {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 14px;
+    padding: 2px 0;
+    text-align: left;
+}
+
+.commentAvatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #555;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.commentBody {
+    flex: 1;
+    min-width: 0;
+    text-align: left;
+}
+
+.commentHeader {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.commentUsername {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #ccc;
+}
+
+.commentDate {
+    font-size: 0.75rem;
+    opacity: 0.5;
+}
+
+.commentContent {
+    font-size: 0.9rem;
+    margin-top: 2px;
+    line-height: 1.4;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    text-align: left;
+}
+
+.commentActions {
+    margin-top: 4px;
+}
+
+.commentDelete {
+    background: none !important;
+    border: none !important;
+    color: #ff0050 !important;
+    padding: 0 !important;
+    font-size: 0.75rem !important;
+    cursor: pointer;
+}
+
+@keyframes vrFadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes vrSlideUp {
+    from {
+        transform: translate(-50%, 100%);
+    }
+
+    to {
+        transform: translate(-50%, 0);
+    }
+}
+
+
+.interactionOverlay {
+    position: absolute;
+    bottom: 20px;
+    right: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    z-index: 10;
+}
+
+.interactionItem {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.interactionBtn {
+    background: transparent;
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.interactionBtnIconOnly {
+    background: transparent;
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+}
+
+.interactionCount {
+    color: white;
+    font-size: 13px;
+    font-weight: 600;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+
+.drawerForm {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.commentInput {
+    flex: 1;
+    padding: 10px 14px;
+    border-radius: 20px;
+    border: 1px solid #333;
+    background: #2a2a2a;
+    color: white;
+    outline: none;
+}
+
+.commentPublicRow {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.commentPublicLabel {
+    font-size: 0.8rem;
+    opacity: 0.7;
+}
+
+.commentSubmit {
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+}
+
+.loginPrompt {
+    text-align: center;
+    opacity: 0.7;
+    padding: 10px;
+    cursor: pointer;
+}
+
+.drawerSpinner {
+    position: relative;
+    left: 50%;
+    top: 20px;
+}
+
+.noComments {
+    text-align: center;
+    opacity: 0.5;
+    margin-top: 20px;
+}
