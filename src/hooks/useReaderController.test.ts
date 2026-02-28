@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { useReaderController } from './useReaderController';
+import { useReaderController, type UseReaderControllerProps } from './useReaderController';
 import type { ContentProvider, Viewer } from '../types/provider';
 import type { ContentChunk } from '../types/model';
 import { DEFAULT_PERFORMANCE_CONFIG } from '../types/config';
@@ -205,6 +205,140 @@ describe('useReaderController', () => {
     });
 
     // --- Buffer pruning ---
+
+    describe('Buffer Pruning & Scroll Tracking Logic', () => {
+        const prunePerformance = { ...DEFAULT_PERFORMANCE_CONFIG, bufferBehind: 1, bufferAhead: 1 };
+        // maxChunks = 1 + 1 + 1 = 3
+
+        const setupScrollContainer = (result: any) => {
+            const container = document.createElement('div');
+            // Mock Dimensions: 2000px height, 800px viewport
+            Object.defineProperty(container, 'scrollHeight', { value: 2000, writable: true });
+            Object.defineProperty(container, 'clientHeight', { value: 800, writable: true });
+            Object.defineProperty(container, 'scrollTop', { value: 0, writable: true });
+            (result.current.containerRef as any).current = container;
+            return container;
+        };
+
+        const simulateScrollDown = (container: HTMLElement) => {
+            // scrollHeight - scrollTop - clientHeight < 200
+            // 2000 - 1100 - 800 = 100 < 200 -> triggers loadMore
+            (container as any).scrollTop = 1100;
+            container.dispatchEvent(new Event('scroll'));
+        };
+
+        const simulateScrollUp = (container: HTMLElement) => {
+            // scrollTop < 200 -> triggers loadPrevious
+            (container as any).scrollTop = 100;
+            container.dispatchEvent(new Event('scroll'));
+        };
+
+        it('prunes from head when scrolling forward past maxChunks via scroll event', async () => {
+            let callCount = 0;
+            const pruneProvider = makeProvider({
+                getInitialContent: vi.fn().mockResolvedValue(makeChunk(['s1'], 'c1')),
+                getContentChunk: vi.fn().mockImplementation(() => {
+                    callCount++;
+                    return Promise.resolve(makeChunk([`s${callCount + 1}`], `c${callCount + 1}`));
+                }),
+            });
+
+            const { result, rerender } = renderHook(
+                (props: UseReaderControllerProps = { bookId, contentProvider: pruneProvider, viewer, performance: prunePerformance }) =>
+                    useReaderController(props)
+            );
+
+            let container: HTMLElement;
+            await act(async () => {
+                container = setupScrollContainer(result);
+            });
+            // Re-render with new performance config to trigger dependency change (loadMore)
+            // This forces the scroll listener useEffect to attach to our mock container.
+            rerender({ bookId, contentProvider: pruneProvider, viewer, performance: { ...prunePerformance, chunkLoadSize: 2 } });
+
+            // Wait for initial load
+            await act(async () => { await new Promise(r => setTimeout(r, 10)); });
+            expect(result.current.chunks).toHaveLength(1);
+
+            // Load 2 (now 2 chunks)
+            await act(async () => {
+                console.log('--- Triggering Load 2 ---');
+                simulateScrollDown(container);
+                await new Promise(r => setTimeout(r, 50));
+            });
+            console.log('Result after Load 2:', result.current.chunks.length);
+            expect(result.current.chunks).toHaveLength(2);
+
+            // Reset loading state safely (internal) by waiting a bit more
+            // Load 3 (now 3 chunks)
+            await act(async () => {
+                simulateScrollDown(container);
+                await new Promise(r => setTimeout(r, 10));
+            });
+            expect(result.current.chunks).toHaveLength(3);
+
+            // Load 4 (exceeds maxChunks 3, should prune head)
+            await act(async () => {
+                simulateScrollDown(container);
+                await new Promise(r => setTimeout(r, 10));
+            });
+
+            expect(result.current.chunks).toHaveLength(3);
+            expect(result.current.chunks[0].items[0].sentenceId).toBe('s2');
+            expect(result.current.chunks[1].items[0].sentenceId).toBe('s3');
+            expect(result.current.chunks[2].items[0].sentenceId).toBe('s4');
+        });
+
+        it('prunes from tail when scrolling backward past maxChunks via scroll event', async () => {
+            let callCount = 0;
+            const pruneProvider = makeProvider({
+                getInitialContent: vi.fn().mockResolvedValue(makeChunk(['s1'], null, 'p1')), // has prevCursor
+                getContentChunk: vi.fn().mockImplementation(() => {
+                    callCount++;
+                    return Promise.resolve(makeChunk([`prev${callCount}`], null, `p${callCount + 1}`));
+                }),
+            });
+
+            const { result, rerender } = renderHook(
+                (props: UseReaderControllerProps = { bookId, contentProvider: pruneProvider, viewer, performance: prunePerformance }) =>
+                    useReaderController(props)
+            );
+
+            let container: HTMLElement;
+            await act(async () => {
+                container = setupScrollContainer(result);
+            });
+            rerender({ bookId, contentProvider: pruneProvider, viewer, performance: { ...prunePerformance, chunkLoadSize: 2 } });
+
+            await act(async () => { await new Promise(r => setTimeout(r, 10)); });
+            expect(result.current.chunks).toHaveLength(1);
+
+            // Load Prev 1 (now 2 chunks)
+            await act(async () => {
+                simulateScrollUp(container);
+                await new Promise(r => setTimeout(r, 10));
+            });
+            expect(result.current.chunks).toHaveLength(2);
+
+            // Load Prev 2 (now 3 chunks)
+            await act(async () => {
+                simulateScrollUp(container);
+                await new Promise(r => setTimeout(r, 10));
+            });
+            expect(result.current.chunks).toHaveLength(3);
+
+            // Load Prev 3 (exceeds maxChunks 3, should prune tail 's1')
+            await act(async () => {
+                simulateScrollUp(container);
+                await new Promise(r => setTimeout(r, 10));
+            });
+
+            expect(result.current.chunks).toHaveLength(3);
+            expect(result.current.chunks[0].items[0].sentenceId).toBe('prev3');
+            expect(result.current.chunks[1].items[0].sentenceId).toBe('prev2');
+            expect(result.current.chunks[2].items[0].sentenceId).toBe('prev1');
+        });
+    });
 
     it('returns correct initial state shape', async () => {
         const { result } = renderHook(() =>

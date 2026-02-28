@@ -32,6 +32,7 @@ export type ReaderUIProps = {
     strings: UiStrings;
     error?: unknown;
     onRetry?: () => void;
+    onShare?: (text: string) => void;
 };
 
 export default function ReaderUI({
@@ -45,6 +46,7 @@ export default function ReaderUI({
     strings,
     error,
     onRetry,
+    onShare,
 }: ReaderUIProps) {
     return (
         <div
@@ -74,9 +76,13 @@ export default function ReaderUI({
                                     onToggleLike={() => interaction.toggleLike(item.sentenceId)}
                                     onOpenComments={() => comments.onOpen(item.sentenceId)}
                                     onShare={() => {
-                                        navigator.clipboard.writeText(item.text)
-                                            .then(() => alert(strings.shareCopied))
-                                            .catch((err) => console.error('Failed to copy text: ', err));
+                                        if (onShare) {
+                                            onShare(item.text);
+                                        } else if (typeof window !== 'undefined') {
+                                            navigator.clipboard.writeText(item.text)
+                                                .then(() => alert(strings.shareCopied))
+                                                .catch((err) => console.error('Failed to copy text: ', err));
+                                        }
                                     }}
                                     strings={strings}
                                 />
@@ -91,9 +97,9 @@ export default function ReaderUI({
             {/* Retry fallback on load error */}
             {!!error && !loading && onRetry && (
                 <div className={styles.retryContainer}>
-                    <p>Failed to load content.</p>
+                    <p>{strings.errorLoadContent}</p>
                     <button className={styles.retryButton} onClick={onRetry}>
-                        Retry
+                        {strings.actionRetry}
                     </button>
                 </div>
             )}

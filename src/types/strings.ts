@@ -11,6 +11,10 @@ export interface UiStrings {
     // Interaction Overlay
     shareLabel: string;
     shareCopied: string;
+
+    // Error & Fallback
+    errorLoadContent: string;
+    actionRetry: string;
 }
 
 export const DEFAULT_UI_STRINGS: UiStrings = {
@@ -23,4 +27,6 @@ export const DEFAULT_UI_STRINGS: UiStrings = {
     commentDelete: "Delete",
     shareLabel: "Share",
     shareCopied: "Copied to clipboard",
+    errorLoadContent: "Failed to load content.",
+    actionRetry: "Retry",
 };

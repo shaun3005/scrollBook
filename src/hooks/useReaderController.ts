@@ -1,7 +1,8 @@
 import type { ContentProvider, Viewer } from '../types/provider';
 import type { PerformanceConfig } from '../types/config';
 import type { BookId, ContentChunk, ContentCursor } from '../types/model';
-import { useState, useEffect, useRef, useCallback, useLayoutEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
 
 export interface UseReaderControllerProps {
     bookId: BookId;
@@ -69,7 +70,7 @@ export const useReaderController = ({
     const scrollAnchorRef = useRef<{ id: string; offset: number } | null>(null);
 
     // Scroll Restoration Logic
-    useLayoutEffect(() => {
+    useIsomorphicLayoutEffect(() => {
         const el = containerRef.current;
         if (!el) return;
 
@@ -87,7 +88,7 @@ export const useReaderController = ({
     }, []);
 
     // Scroll Restoration Logic
-    useLayoutEffect(() => {
+    useIsomorphicLayoutEffect(() => {
         const anchor = scrollAnchorRef.current;
         if (!anchor || !containerRef.current) return;
 

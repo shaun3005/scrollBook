@@ -22,6 +22,7 @@ export type VerticalReadReaderProps = {
     callbacks?: {
         onRequireLogin?: (reason: 'like' | 'comment' | 'bookmark' | string) => void;
         onError?: (err: unknown, context: { scope: 'content' | 'stats' | 'comments' }) => void;
+        onShare?: (text: string) => void;
     };
     strings?: Partial<UiStrings>;
 };
@@ -105,6 +106,7 @@ export const VerticalReadReader = ({
                 strings={mergedStrings}
                 error={error}
                 onRetry={retryLoad}
+                onShare={callbacks?.onShare}
             />
         </ErrorBoundary>
     );

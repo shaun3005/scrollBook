@@ -1,3 +1,5 @@
+"use client";
+
 export { VerticalReadReader } from './VerticalReadReader';
 export type { VerticalReadReaderProps } from './VerticalReadReader';
 
