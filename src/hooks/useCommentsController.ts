@@ -78,11 +78,6 @@ export const useCommentsController = ({
             return;
         }
 
-        if (!interactionProvider.deleteComment) {
-            console.warn('interactionProvider.deleteComment is not implemented');
-            return;
-        }
-
         // Optimistic Update
         if (activeSentenceId) {
             onCommentCountChange?.(activeSentenceId, -1);

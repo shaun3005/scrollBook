@@ -89,7 +89,7 @@ export interface InteractionProvider {
         viewer: Viewer; // Login required
     }): Promise<Comment>;
 
-    deleteComment?(args: {
+    deleteComment(args: {
         bookId: BookId;
         commentId: string;
         viewer: Viewer;

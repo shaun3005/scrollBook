@@ -87,6 +87,9 @@ const interactionProvider: InteractionProvider = {
   async addComment({ content }) {
     return { id: 'c-1', sentenceId: 's-1', userId: 'u-1', content, createdAt: new Date().toISOString(), isPublic: true };
   },
+  async deleteComment({ commentId }) {
+    return { success: true };
+  },
 };
 
 export default function ReaderPage() {
