@@ -20,6 +20,7 @@ const makeProvider = (overrides?: Partial<InteractionProvider>): InteractionProv
     toggleLikeSentence: vi.fn().mockResolvedValue({ sentenceId: 's1', likedByMe: true, likesCount: 6 }),
     listComments: vi.fn().mockResolvedValue([]),
     addComment: vi.fn().mockResolvedValue({}),
+    deleteComment: vi.fn().mockResolvedValue({ success: true }),
     ...overrides,
 });
 

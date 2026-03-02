@@ -33,6 +33,7 @@ const makeInteractionProvider = (): InteractionProvider => ({
     toggleLikeSentence: vi.fn().mockResolvedValue({ sentenceId: 's1', likedByMe: true }),
     listComments: vi.fn().mockResolvedValue([]),
     addComment: vi.fn().mockResolvedValue({}),
+    deleteComment: vi.fn().mockResolvedValue({ success: true }),
 });
 
 describe('VerticalReadReader (Integration)', () => {
